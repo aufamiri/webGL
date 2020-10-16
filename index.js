@@ -45,7 +45,7 @@ function setupBuffers() {
     -0.5,
     0.0,
 
-    /*     0.5,
+    0.5,
     0.2,
     0.0,
     0.1,
@@ -53,10 +53,10 @@ function setupBuffers() {
     0.0,
     0.9,
     0.5,
-    0.0, */
+    0.0,
   ];
 
-  var colors = [0, 0, 1, 1, 0, 0, 0, 1, 0 /* 1, 1, 0, 1, 0, 1, 0, 1, 1*/];
+  var colors = [0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1];
 
   gl.bufferData(
     gl.ARRAY_BUFFER,
@@ -119,6 +119,7 @@ function draw() {
 
   gl.clear(gl.COLOR_BUFFER_BIT);
 
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.vertexAttribPointer(
     shaderProgram.vertexPositionAttribute,
     vertexBuffer.itemSize,
@@ -129,6 +130,8 @@ function draw() {
   );
 
   gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 
   gl.vertexAttribPointer(
     shaderProgram.color,

@@ -1,7 +1,5 @@
 /** @type {WebGLRenderingContext} */
 var gl;
-/** @type {HTMLCanvasElement} */
-var canvas;
 var shaderProgram;
 var vertexBuffer;
 var colorBuffer;
@@ -28,12 +26,6 @@ void main() {
 `;
 
 function setupBuffers() {
-  vertexBuffer = gl.createBuffer();
-
-  colorBuffer = gl.createBuffer();
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-
   var triangleVertices = [
     0.0,
     0.5,
@@ -58,66 +50,37 @@ function setupBuffers() {
 
   var colors = [0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1];
 
+  vertexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.bufferData(
     gl.ARRAY_BUFFER,
     new Float32Array(triangleVertices),
     gl.STATIC_DRAW
   );
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
+  colorBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
   vertexBuffer.itemSize = 3;
-
   vertexBuffer.numberOfItems = triangleVertices.length / vertexBuffer.itemSize;
 }
 
-function setupShaders() {
-  var vertextShader = loadShader(gl.VERTEX_SHADER, vertextShaderSource);
-  var fragmentShader = loadShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
-
-  shaderProgram = gl.createProgram();
-  gl.attachShader(shaderProgram, vertextShader);
-  gl.attachShader(shaderProgram, fragmentShader);
-  gl.linkProgram(shaderProgram);
-
-  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    console.error("failed to setup shaders");
-  }
-
-  gl.useProgram(shaderProgram);
-
-  shaderProgram.vertexPositionAttribute = gl.getAttribLocation(
-    shaderProgram,
-    "aVertexPosition"
+/**
+ *
+ * @param {WebGLRenderingContext} gl
+ * @param {BufferSource} bufferData
+ * @param {number} itemSize
+ * @param {number} numberOfItems
+ */
+function draw(gl, bufferData, itemSize, numberOfItems) {
+  const tempBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, tempBuffer);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array(triangleVertices),
+    gl.STATIC_DRAW
   );
-
-  shaderProgram.color = gl.getAttribLocation(shaderProgram, "color");
-}
-
-function loadShader(type, shaderSource) {
-  var shader = gl.createShader(type);
-
-  gl.shaderSource(shader, shaderSource);
-  gl.compileShader(shader);
-
-  // if something happened, delete the shader and return null
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error(`ERROR ${gl.getShaderInfoLog(shader)}`);
-    gl.deleteShader(shader);
-    return null;
-  }
-
-  return shader;
-}
-
-function draw() {
-  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-
-  gl.clear(gl.COLOR_BUFFER_BIT);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.vertexAttribPointer(
@@ -147,11 +110,32 @@ function draw() {
 }
 
 function startup() {
-  canvas = document.getElementById("canvas");
+  /** @type {HTMLCanvasElement} */
+  var canvas = document.getElementById("canvas");
   gl = createGLContext(canvas);
-  setupShaders();
+
+  /** @type {WebGLProgram} */
+  var shaderProgram = setupShaders(
+    gl,
+    vertextShaderSource,
+    fragmentShaderSource
+  );
+
+  const programInfo = {
+    attr: {
+      vertexPostition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
+      color: gl.getAttribLocation(shaderProgram, "color"),
+    },
+  };
+
+  gl.useProgram(shaderProgram);
+
   setupBuffers();
+
   gl.clearColor(102 / 255, 153 / 255, 1.0, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+
   draw();
 }
 

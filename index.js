@@ -57,29 +57,11 @@ function startup() {
     },
   };
 
-  var triangleVertices = [
-    0.0,
-    0.5,
-    0.0,
-    -0.5,
-    -0.5,
-    0.0,
-    0.5,
-    -0.5,
-    0.0,
+  var triangleVertices = [0.0, 0.5, 0.0, -0.5, -0.5, 0.0, 0.5, -0.5, 0.0];
+  var colors = [0, 0, 1, 1, 0, 0, 0, 1, 0];
 
-    0.5,
-    0.2,
-    0.0,
-    0.1,
-    0.5,
-    0.0,
-    0.9,
-    0.5,
-    0.0,
-  ];
-
-  var colors = [0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1];
+  var newTirangle = [0.5, 0.2, 0.0, 0.1, 0.5, 0.0, 0.9, 0.5, 0.0];
+  var newColors = [1, 1, 0, 1, 0, 1, 0, 1, 1];
 
   gl.useProgram(shaderProgram);
 
@@ -94,11 +76,13 @@ function startup() {
     3,
     programInfo.attr.vertexPostition
   );
-
   // draw colors
   draw(gl, new Float32Array(colors), 3, programInfo.attr.color);
-
   gl.drawArrays(gl.TRIANGLES, 0, triangleVertices.length / 3);
+
+  draw(gl, new Float32Array(newTirangle), 3, programInfo.attr.vertexPostition);
+  draw(gl, new Float32Array(newColors), 3, programInfo.attr.color);
+  gl.drawArrays(gl.TRIANGLES, 0, newTirangle.length / 3);
 }
 
 /**

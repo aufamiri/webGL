@@ -1,9 +1,3 @@
-/** @type {WebGLRenderingContext} */
-var gl;
-var shaderProgram;
-var vertexBuffer;
-var colorBuffer;
-
 var vertextShaderSource = `
 attribute vec3 aVertexPosition;
 attribute vec3 color;
@@ -25,7 +19,44 @@ void main() {
 }
 `;
 
-function setupBuffers() {
+/**
+ * bind data to buffer and pass it to the shader
+ *
+ * @param {WebGLRenderingContext} gl
+ * @param {BufferSource} bufferData
+ * @param {number} itemSize
+ * @param {number} attrLocation
+ */
+function draw(gl, bufferData, itemSize, attrLocation) {
+  const tempBuffer = gl.createBuffer();
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, tempBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, bufferData, gl.STATIC_DRAW);
+
+  gl.vertexAttribPointer(attrLocation, itemSize, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(attrLocation);
+}
+
+function startup() {
+  /** @type {HTMLCanvasElement} */
+  const canvas = document.getElementById("canvas");
+
+  /** @type {WebGLRenderingContext} */
+  const gl = createGLContext(canvas);
+
+  const shaderProgram = setupShaders(
+    gl,
+    vertextShaderSource,
+    fragmentShaderSource
+  );
+
+  const programInfo = {
+    attr: {
+      vertexPostition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
+      color: gl.getAttribLocation(shaderProgram, "color"),
+    },
+  };
+
   var triangleVertices = [
     0.0,
     0.5,
@@ -50,93 +81,24 @@ function setupBuffers() {
 
   var colors = [0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1];
 
-  vertexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-  gl.bufferData(
-    gl.ARRAY_BUFFER,
-    new Float32Array(triangleVertices),
-    gl.STATIC_DRAW
-  );
-
-  colorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-
-  vertexBuffer.itemSize = 3;
-  vertexBuffer.numberOfItems = triangleVertices.length / vertexBuffer.itemSize;
-}
-
-/**
- *
- * @param {WebGLRenderingContext} gl
- * @param {BufferSource} bufferData
- * @param {number} itemSize
- * @param {number} numberOfItems
- */
-function draw(gl, bufferData, itemSize, numberOfItems) {
-  const tempBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, tempBuffer);
-  gl.bufferData(
-    gl.ARRAY_BUFFER,
-    new Float32Array(triangleVertices),
-    gl.STATIC_DRAW
-  );
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-  gl.vertexAttribPointer(
-    shaderProgram.vertexPositionAttribute,
-    vertexBuffer.itemSize,
-    gl.FLOAT,
-    false,
-    0,
-    0
-  );
-
-  gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-
-  gl.vertexAttribPointer(
-    shaderProgram.color,
-    vertexBuffer.itemSize,
-    gl.FLOAT,
-    false,
-    0,
-    0
-  );
-  gl.enableVertexAttribArray(shaderProgram.color);
-
-  gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.numberOfItems);
-}
-
-function startup() {
-  /** @type {HTMLCanvasElement} */
-  var canvas = document.getElementById("canvas");
-  gl = createGLContext(canvas);
-
-  /** @type {WebGLProgram} */
-  var shaderProgram = setupShaders(
-    gl,
-    vertextShaderSource,
-    fragmentShaderSource
-  );
-
-  const programInfo = {
-    attr: {
-      vertexPostition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
-      color: gl.getAttribLocation(shaderProgram, "color"),
-    },
-  };
-
   gl.useProgram(shaderProgram);
-
-  setupBuffers();
 
   gl.clearColor(102 / 255, 153 / 255, 1.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 
-  draw();
+  // draw vertice
+  draw(
+    gl,
+    new Float32Array(triangleVertices),
+    3,
+    programInfo.attr.vertexPostition
+  );
+
+  // draw colors
+  draw(gl, new Float32Array(colors), 3, programInfo.attr.color);
+
+  gl.drawArrays(gl.TRIANGLES, 0, triangleVertices.length / 3);
 }
 
 /**

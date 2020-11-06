@@ -10,6 +10,8 @@ var vertexPositionBuffer;
 
 var vertexColorBuffer;
 
+var then = 0;
+
 /* Fungsi untuk membuat WebGL Context */
 function createGLContext(canvas) {
   var names = ["webgl", "experimental-webgl"];
@@ -139,10 +141,34 @@ function setupBuffers() {
   vertexColorBuffer.numItems = colors.length / 4;
 }
 
-/* Fungsi Draw */
-function draw() {
+function render(now) {
+  now *= 0.001;
+  const deltaTime = now - then;
+
+  then = now;
+
+  requestAnimationFrame(render);
+}
+
+/**
+ * Fungsi Draw
+ * @param {WebGLRenderingContext} gl
+ * @param {BufferSource} buffers
+ * @param {number} deltaTime
+ * @param {any} programInfo
+ */
+function drawScene(gl, programInfo, buffers, deltaTime) {
+  gl.clearColor(1.0 / 255.0, 56.0 / 255.0, 128.0 / 255.0, 1.0);
+  gl.clearDepth(1.0);
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  const projectionMatrix = mat4.create();
+
+  mat4.perspective(projectionMatrix);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.vertexAttribPointer(
@@ -176,6 +202,7 @@ function startup() {
   gl = createGLContext(canvas);
   setupShaders();
   setupBuffers();
+  requestAnimationFrame(render);
   gl.clearColor(1.0 / 255.0, 56.0 / 255.0, 128.0 / 255.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
   draw();

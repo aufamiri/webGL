@@ -168,10 +168,6 @@ function render(now) {
  * @param {number} deltaTime
  */
 function drawScene(deltaTime) {
-  gl.clearColor(1.0 / 255.0, 56.0 / 255.0, 128.0 / 255.0, 1.0);
-  gl.clearDepth(1.0);
-  gl.enable(gl.DEPTH_TEST);
-  gl.depthFunc(gl.LEQUAL);
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -184,6 +180,11 @@ function drawScene(deltaTime) {
 
   const modelViewMatrix = mat4.create();
 
+  mat4.translate(
+    modelViewMatrix, // destination matrix
+    modelViewMatrix, // matrix to translate
+    [0.0, 0.3, -6.0]
+  );
   mat4.rotate(modelViewMatrix, modelViewMatrix, rotate, [0, 0, 1]);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
@@ -232,8 +233,9 @@ function startup() {
   gl = createGLContext(canvas);
   setupShaders();
   setupBuffers();
-  requestAnimationFrame(render);
+
   gl.clearColor(1.0 / 255.0, 56.0 / 255.0, 128.0 / 255.0, 1.0);
-  gl.enable(gl.DEPTH_TEST);
+  requestAnimationFrame(render);
+  // drawScene(10);
   // draw();
 }

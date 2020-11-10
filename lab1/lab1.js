@@ -12,6 +12,8 @@ var vertexColorBuffer;
 
 var then = 0;
 
+var rotate = 0.0;
+
 /* Fungsi untuk membuat WebGL Context */
 function createGLContext(canvas) {
   var names = ["webgl", "experimental-webgl"];
@@ -95,6 +97,15 @@ function setupShaders() {
     "aVertexColor"
   );
   gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+
+  shaderProgram.uniformProjectionMatrix = gl.getUniformLocation(
+    shaderProgram,
+    "uProjectionMatrix"
+  );
+  shaderProgram.uniformModelViewMatrix = gl.getUniformLocation(
+    shaderProgram,
+    "uModelViewMatrix"
+  );
 }
 
 /* Setup buffers dengan data */
@@ -147,17 +158,16 @@ function render(now) {
 
   then = now;
 
+  drawScene(deltaTime);
+
   requestAnimationFrame(render);
 }
 
 /**
  * Fungsi Draw
- * @param {WebGLRenderingContext} gl
- * @param {BufferSource} buffers
  * @param {number} deltaTime
- * @param {any} programInfo
  */
-function drawScene(gl, programInfo, buffers, deltaTime) {
+function drawScene(deltaTime) {
   gl.clearColor(1.0 / 255.0, 56.0 / 255.0, 128.0 / 255.0, 1.0);
   gl.clearDepth(1.0);
   gl.enable(gl.DEPTH_TEST);
@@ -166,9 +176,15 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const projectionMatrix = mat4.create();
+  const fieldOfView = (45 * Math.PI) / 180; //45 degree angle
+  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
-  mat4.perspective(projectionMatrix);
+  const projectionMatrix = mat4.create();
+  mat4.perspective(projectionMatrix, fieldOfView, aspect, 0.1, 100.0);
+
+  const modelViewMatrix = mat4.create();
+
+  mat4.rotate(modelViewMatrix, modelViewMatrix, rotate, [0, 0, 1]);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.vertexAttribPointer(
@@ -190,7 +206,21 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
     0
   );
 
+  gl.uniformMatrix4fv(
+    shaderProgram.uniformProjectionMatrix,
+    false,
+    projectionMatrix
+  );
+
+  gl.uniformMatrix4fv(
+    shaderProgram.uniformModelViewMatrix,
+    false,
+    modelViewMatrix
+  );
+
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertexPositionBuffer.numberOfItems);
+
+  rotate += deltaTime;
 }
 
 /* Fungsi yang dipanggil setelah page diload */
@@ -205,5 +235,5 @@ function startup() {
   requestAnimationFrame(render);
   gl.clearColor(1.0 / 255.0, 56.0 / 255.0, 128.0 / 255.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
-  draw();
+  // draw();
 }

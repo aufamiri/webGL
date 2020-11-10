@@ -10,6 +10,8 @@ var vertexPositionBuffer;
 
 var vertexColorBuffer;
 
+var indicesBuffer;
+
 var then = 0;
 
 var rotate = 0.0;
@@ -115,14 +117,49 @@ function setupBuffers() {
 
   //prettier-ignore
   var triangleVertices = [
-      0.0,  0.3, 0.0, 
-     -0.05, 0.2, 0.0, 
-     -0.3,  0.3, 0.0,
-     -0.23, 0.2, 0.0,
-     -0.4, -0.3, 0.0,
-     -0.3,-0.2, 0.0,
-      0.05,-0.3, 0.0,
-      0.0,-0.2, 0.0,
+          //HURUF C
+           0.0, 0.5, 0.0,
+           0.1,  0.75,  0.0,
+          -0.3,  0.5,  0.0,
+           0.1,  0.75,  0.0,
+          -0.3,  0.5,  0.0,
+          -0.50,  0.75,  0.0,
+          -0.3,  0.5,  0.0,
+          -0.50,  0.75,  0.0,
+          -0.75,  -0.75,  0.0,
+          -0.75,  -0.75,  0.0,
+          -0.5, -0.5,   0.0,
+          -0.3,  0.5,  0.0,
+          -0.75,  -0.75,  0.0,
+           0.2, -0.75,  0.0,
+          -0.5, -0.5,   0.0,
+          -0.5, -0.5,   0.0,
+           0.2, -0.75,  0.0,
+           0.1, -0.5,   0.0,
+
+
+           //HURUF E
+
+           //main spine
+           -0.3, 0.12, 0.0,
+           0.7, 0.12, 0.0,
+           -0.35, -0.12, 0.0,
+           0.7, 0.12, 0.0,
+           -0.35, -0.12, 0.0,
+           0.65, -0.12, 0.0,
+
+           //upside wings
+          0.0, 0.12, 0.0,
+          0.35, 0.5, 0.0,
+          0.2, 0.75, 0.0,
+
+          0.0, 0.12, 0.0,
+          0.35, 0.5, 0.0,
+          0.3, 0.12, 0.0,
+
+
+
+           
     ];
 
   gl.bufferData(
@@ -138,15 +175,41 @@ function setupBuffers() {
 
   //prettier-ignore
   var colors = [
-    0, 0, 1, 1, 
-    1, 0, 0, 1, 
-    0, 1, 0, 1,
-    0, 1, 1, 1,
-    0, 1, 1, 1,
-    1, 0, 0, 1, 
-    1, 0, 0, 1, 
-    1, 0, 0, 1, 
-];
+        //HURUF C
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+        1.0, 0.0, 0.0, 1.0,
+
+        //HURUF E
+        1.0, 0.0, 0.0, 1.0,
+        1.0, 0.0, 0.0, 1.0,
+        1.0, 0.0, 0.0, 1.0,
+        1.0, 0.0, 0.0, 1.0,
+        1.0, 0.0, 0.0, 1.0,
+        1.0, 0.0, 0.0, 1.0,
+
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+    ];
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
   vertexColorBuffer.itemSize = 4;
   vertexColorBuffer.numItems = colors.length / 4;
@@ -219,7 +282,7 @@ function drawScene(deltaTime) {
     modelViewMatrix
   );
 
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertexPositionBuffer.numberOfItems);
+  gl.drawArrays(gl.TRIANGLES, 0, vertexPositionBuffer.numberOfItems);
 
   rotate += deltaTime;
 }
@@ -235,7 +298,7 @@ function startup() {
   setupBuffers();
 
   gl.clearColor(1.0 / 255.0, 56.0 / 255.0, 128.0 / 255.0, 1.0);
-  requestAnimationFrame(render);
-  // drawScene(10);
+  // requestAnimationFrame(render);
+  drawScene(0);
   // draw();
 }

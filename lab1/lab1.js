@@ -1,6 +1,6 @@
 /**
  * Source Code : https://github.com/chillytaka/webGL/tree/master/lab1
- * Demo : https://chillytaka.github.io/webgl-lab1
+ * Demo : https://chillytaka.github.io/webgl-lab1/lab1.html
  */
 
 /** @type{WebGLRenderingContext} */

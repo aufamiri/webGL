@@ -54,6 +54,42 @@ function getShaderfromDOM(id) {
 }
 
 /**
+ * @param {int} pointN  jumlah banyaknya vertex
+ * @param {int} pusatX koordinat X pusat lingkaran
+ * @param {int} pusatY koordinat Y pusat lingkaran
+ * @param {int} radius radius lingkaran
+ * @param {array} color color value in array [R, G, B, 1.0]
+ *
+ *
+ * @typedef {Object} result
+ * @property {array} vertexData array vertexData
+ * @property {array} colors array colors
+ *
+ * @returns {result}
+ */
+
+function createCircle(pointN, pusatX, pusatY, radius, color) {
+  var vertexData = [pusatX, pusatY];
+
+  for (var i = 0; i <= pointN; i++) {
+    var theta = (i * 2 * Math.PI) / pointN;
+    var x = pusatX + radius * Math.sin(theta);
+    var y = pusatY + radius * Math.cos(theta);
+    vertexData.push(x, y);
+  }
+
+  var colors = [];
+  for (var i = 0; i != vertexData.length; i++) {
+    colors = colors.concat(color);
+  }
+
+  return {
+    vertexData: vertexData,
+    colors: colors,
+  };
+}
+
+/**
  * bind data to buffer and pass it to the shader
  *
  * @param {WebGLRenderingContext} gl
@@ -68,7 +104,6 @@ function draw(gl, bufferData, itemSize, attrLocation) {
   gl.bufferData(gl.ARRAY_BUFFER, bufferData, gl.STATIC_DRAW);
 
   gl.vertexAttribPointer(attrLocation, itemSize, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(attrLocation);
 }
 
 function startup() {
@@ -98,33 +133,33 @@ function startup() {
     },
   };
 
-  var N = 100;
-  var vertexData = [0.0, 0.0];
-  var r = 0.2;
+  gl.enableVertexAttribArray(programInfo.attr.vertexPostition);
+  gl.enableVertexAttribArray(programInfo.attr.color);
 
-  for (var i = 0; i <= N; i++) {
-    var theta = (i * 2 * Math.PI) / N;
-    var x = r * Math.sin(theta);
-    var y = r * Math.cos(theta);
-    vertexData.push(x, y);
-  }
-
-  var colors = [];
-  for (var i = 0; i != vertexData.length; i++) {
-    colors.push(0.0, 0.0, 0.0, 1.0);
-  }
-
-  console.log(vertexData);
-  console.log(colors.length);
-  console.log(vertexData.length);
-
-  gl.useProgram(shaderProgram);
+  circle = createCircle(100, 0, 0, 0.3, [0, 0, 0, 1.0]);
+  circle2 = createCircle(100, 0.3, 0, 0.1, [0, 0, 1, 1.0]);
 
   gl.clearColor(102 / 255, 153 / 255, 1.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 
-  draw(gl, new Float32Array(vertexData), 2, programInfo.attr.vertexPostition);
-  draw(gl, new Float32Array(colors), 4, programInfo.attr.color);
-  gl.drawArrays(gl.TRIANGLE_FAN, 0, vertexData.length / 2);
+  gl.useProgram(shaderProgram);
+
+  draw(
+    gl,
+    new Float32Array(circle.vertexData),
+    2,
+    programInfo.attr.vertexPostition
+  );
+  draw(gl, new Float32Array(circle.colors), 4, programInfo.attr.color);
+  gl.drawArrays(gl.TRIANGLE_FAN, 0, circle.vertexData.length / 2);
+
+  draw(
+    gl,
+    new Float32Array(circle2.vertexData),
+    2,
+    programInfo.attr.vertexPostition
+  );
+  draw(gl, new Float32Array(circle2.colors), 4, programInfo.attr.color);
+  gl.drawArrays(gl.TRIANGLE_FAN, 0, circle2.vertexData.length / 2);
 }

@@ -77,7 +77,6 @@ var anim = {
 };
 
 /**
- *
  * @param {WebGLRenderingContext} gl GL Rendering COntext
  * @param {number} deltaTime Elapsed Time
  * @param {Object} uniformLocation object cotanining WebGLUniformLocation

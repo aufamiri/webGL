@@ -38,7 +38,8 @@ function drawUniform(gl, attrLocation, uniformData) {
 }
 
 var anim = {
-  prevModelView: undefined,
+  prevTranslate: undefined,
+  prevParentId: -2,
 
   render: function () {
     anim.gl.viewport(0, 0, anim.canvas.width, anim.canvas.height);
@@ -59,14 +60,26 @@ var anim = {
         anim.programInfo.attr.color
       );
 
-      anim.prevModelView = animate(
+      console.log(anim.prevTranslate);
+
+      tempTranslate = animate(
         anim.gl,
         anim.canvas,
         anim.programInfo.uniform,
         objectArray[i].object.vertexData.length,
         objectArray[i].currentRotation,
-        objectArray[i].translation
+        objectArray[i].translation,
+        anim.prevTranslate
       );
+
+      if (objectArray[i].parentId != anim.prevParentId) {
+        anim.prevParentId = objectArray[i].parentId;
+        anim.prevTranslate = undefined;
+      }
+
+      if (objectArray[i].hasChild) {
+        anim.prevTranslate = tempTranslate;
+      }
 
       if (objectArray[i].currentRotation > 6) {
         objectArray[i].currentRotation -= 6;
@@ -76,7 +89,7 @@ var anim = {
         objectArray[i].currentRotation + objectArray[i].deltaRotation;
     }
 
-    window.requestAnimationFrame(this.render);
+    // window.requestAnimationFrame(this.render);
   },
 };
 
@@ -88,7 +101,7 @@ var anim = {
  * @param {HTMLCanvasElement} canvas HTML Canvas Element
  * @param {number} rotate the angle of rotation
  * @param {number[]} translate translation value
- * @param {Iterable} prevModelView previous iteration modelView
+ * @param {Iterable} prevTranslate previous iteration modelView
  *
  * @returns {Iterable}
  */
@@ -99,7 +112,7 @@ function animate(
   vertexLength,
   rotate,
   translate,
-  prevModelView
+  prevTranslate
 ) {
   //projection View Matrix
   const fieldOfView = (45 * Math.PI) / 180; //45 degree angle
@@ -109,23 +122,26 @@ function animate(
   mat4.perspective(projectionMatrix, fieldOfView, aspect, 0.1, 100.0);
 
   //ModelView Matrix
-  const modelViewMatrix = mat4.create();
+  var modelViewMatrix = mat4.create();
 
-  if (prevModelView != undefined) {
-    modelViewMatrix = prevModelView;
+  if (prevTranslate != undefined) {
+    modelViewMatrix = prevTranslate;
   }
 
-  mat4.rotate(modelViewMatrix, modelViewMatrix, rotate, [0, 0, 1]);
   mat4.translate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to translate
     translate
   );
+  mat4.rotate(modelViewMatrix, modelViewMatrix, rotate, [0, 0, 1]);
 
   drawUniform(gl, uniformLocation.projection, projectionMatrix);
   drawUniform(gl, uniformLocation.modelView, modelViewMatrix);
 
   gl.drawArrays(gl.TRIANGLE_FAN, 0, vertexLength / 2);
+
+  var translateResult = vec3.create();
+  mat4.getTranslation(translateResult, modelViewMatrix);
 
   return modelViewMatrix;
 }
@@ -160,20 +176,20 @@ function startup() {
   gl.enableVertexAttribArray(programInfo.attr.vertexPostition);
   gl.enableVertexAttribArray(programInfo.attr.color);
 
-  var zIndex = -10;
+  var zIndex = -5;
 
   objectArray.push({
-    object: createCircle(100, 0, 0, 0.5, [0, 0, 0, 1.0]),
+    object: createCircle(6, 0, 0, 0.2, [0, 0, 0, 1.0]),
     translation: [0, 0, zIndex],
-    deltaRotation: 0,
+    deltaRotation: 0.0,
     currentRotation: 0,
     hasChild: true,
     parentId: -1,
   });
 
   objectArray.push({
-    object: createCircle(100, 0, 0, 0.3, [0, 0, 1, 1.0]),
-    translation: [-1, 0, zIndex],
+    object: createCircle(6, 0, 0, 0.1, [0, 0, 1, 1.0]),
+    translation: [-2, 0, zIndex],
     deltaRotation: 0.02,
     currentRotation: 0,
     hasChild: true,
@@ -181,8 +197,8 @@ function startup() {
   });
 
   objectArray.push({
-    object: createCircle(100, 0, 0, 0.3, [0, 0, 1, 1.0]),
-    translation: [-0.5, 0, zIndex],
+    object: createCircle(6, 0, 0, 0.1, [0, 1, 1, 1.0]),
+    translation: [0, 0, zIndex],
     deltaRotation: 0.05,
     currentRotation: 0,
     hasChild: false,

@@ -31,7 +31,7 @@ function createGLContext(canvas) {
 
 /**
  * Load Shader Script from DOM
- * @param {String} id
+ * @param {string} id
  */
 function getShaderfromDOM(id) {
   var shaderScript = document.getElementById(id);
@@ -53,18 +53,18 @@ function getShaderfromDOM(id) {
 }
 
 /**
- * @param {int} pointN  jumlah banyaknya vertex
- * @param {int} pusatX koordinat X pusat lingkaran
- * @param {int} pusatY koordinat Y pusat lingkaran
- * @param {int} radius radius lingkaran
- * @param {array} color color value in array [R, G, B, 1.0]
+ * @param {number} pointN  jumlah banyaknya vertex
+ * @param {number} pusatX koordinat X pusat lingkaran
+ * @param {number} pusatY koordinat Y pusat lingkaran
+ * @param {number} radius radius lingkaran
+ * @param {number[]} color color value in array [R, G, B, 1.0]
  *
  *
- * @typedef {Object} result
- * @property {array} vertexData array vertexData
- * @property {array} colors array colors
+ * @typedef {Object} circle
+ * @property {number[]} vertexData array vertexData
+ * @property {number[]} colors array colors
  *
- * @returns {result}
+ * @returns {circle}
  */
 
 function createCircle(pointN, pusatX, pusatY, radius, color) {

@@ -4,6 +4,8 @@
  * @property {number[]} translation translation of the object in [X, Y, Z]
  * @property {number} deltaRotation the speed of the rotation
  * @property {number} currentRotation current angle of the rotation
+ * @property {boolean} hasChild place in the hierarchy
+ * @property {number} parentId the id of the parent
  */
 
 /** @type {objectArray[]} */
@@ -36,6 +38,8 @@ function drawUniform(gl, attrLocation, uniformData) {
 }
 
 var anim = {
+  prevModelView: undefined,
+
   render: function () {
     anim.gl.viewport(0, 0, anim.canvas.width, anim.canvas.height);
     anim.gl.clear(anim.gl.COLOR_BUFFER_BIT | anim.gl.DEPTH_BUFFER_BIT);
@@ -55,7 +59,7 @@ var anim = {
         anim.programInfo.attr.color
       );
 
-      animate(
+      anim.prevModelView = animate(
         anim.gl,
         anim.canvas,
         anim.programInfo.uniform,
@@ -84,8 +88,19 @@ var anim = {
  * @param {HTMLCanvasElement} canvas HTML Canvas Element
  * @param {number} rotate the angle of rotation
  * @param {number[]} translate translation value
+ * @param {Iterable} prevModelView previous iteration modelView
+ *
+ * @returns {Iterable}
  */
-function animate(gl, canvas, uniformLocation, vertexLength, rotate, translate) {
+function animate(
+  gl,
+  canvas,
+  uniformLocation,
+  vertexLength,
+  rotate,
+  translate,
+  prevModelView
+) {
   //projection View Matrix
   const fieldOfView = (45 * Math.PI) / 180; //45 degree angle
   const aspect = canvas.clientWidth / canvas.clientHeight;
@@ -95,6 +110,10 @@ function animate(gl, canvas, uniformLocation, vertexLength, rotate, translate) {
 
   //ModelView Matrix
   const modelViewMatrix = mat4.create();
+
+  if (prevModelView != undefined) {
+    modelViewMatrix = prevModelView;
+  }
 
   mat4.rotate(modelViewMatrix, modelViewMatrix, rotate, [0, 0, 1]);
   mat4.translate(
@@ -107,6 +126,8 @@ function animate(gl, canvas, uniformLocation, vertexLength, rotate, translate) {
   drawUniform(gl, uniformLocation.modelView, modelViewMatrix);
 
   gl.drawArrays(gl.TRIANGLE_FAN, 0, vertexLength / 2);
+
+  return modelViewMatrix;
 }
 
 function startup() {
@@ -142,17 +163,30 @@ function startup() {
   var zIndex = -10;
 
   objectArray.push({
-    object: createCircle(100, 0, 0, 0.3, [0, 0, 1, 1.0]),
-    translation: [-1, 0, zIndex],
-    deltaRotation: 0.1,
-    currentRotation: 0,
-  });
-
-  objectArray.push({
     object: createCircle(100, 0, 0, 0.5, [0, 0, 0, 1.0]),
     translation: [0, 0, zIndex],
     deltaRotation: 0,
     currentRotation: 0,
+    hasChild: true,
+    parentId: -1,
+  });
+
+  objectArray.push({
+    object: createCircle(100, 0, 0, 0.3, [0, 0, 1, 1.0]),
+    translation: [-1, 0, zIndex],
+    deltaRotation: 0.02,
+    currentRotation: 0,
+    hasChild: true,
+    parentId: 0,
+  });
+
+  objectArray.push({
+    object: createCircle(100, 0, 0, 0.3, [0, 0, 1, 1.0]),
+    translation: [-0.5, 0, zIndex],
+    deltaRotation: 0.05,
+    currentRotation: 0,
+    hasChild: false,
+    parentId: 1,
   });
 
   gl.clearColor(102 / 255, 153 / 255, 1.0, 1.0);

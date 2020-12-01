@@ -293,12 +293,15 @@ function drawScene(deltaTime) {
 
   const modelViewMatrix = mat4.create();
 
+  console.log(rotate);
+  console.log(deltaTime);
+
+  mat4.rotate(modelViewMatrix, modelViewMatrix, rotate, [0, 0, 1]);
   mat4.translate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to translate
-    [0.0, 0.3, -6.0]
+    [10.0, 0.0, -50.0]
   );
-  mat4.rotate(modelViewMatrix, modelViewMatrix, rotate, [0, 0, 1]);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.vertexAttribPointer(

@@ -1,109 +1,72 @@
 /**
- *
- * @param {HTMLCanvasElement} canvas
- * @returns {WebGLRenderingContext} context
- */
-function createGLContext(canvas) {
-  var names = ["webgl", "experimental-webgl"];
-  var context = null;
-
-  // checking if the browser support WebGL or not
-  for (var i = 0; i < names.length; i++) {
-    try {
-      context = canvas.getContext(names[i]);
-    } catch (e) {
-      console.error(e);
-    }
-
-    if (context) {
-      break;
-    }
-  }
-
-  if (context) {
-    context.viewportWidth = canvas.width;
-    context.viewportHeight = canvas.height;
-  } else {
-    console.error("failed to create WEBGL context");
-  }
-
-  return context;
-}
-
-/**
- * Load Shader Script from DOM
- * @param {String} id
- */
-function getShaderfromDOM(id) {
-  var shaderScript = document.getElementById(id);
-
-  if (!shaderScript) {
-    return null;
-  }
-
-  var shaderSource = "";
-  var currentChild = shaderScript.firstChild;
-  while (currentChild) {
-    if (currentChild.nodeType == 3) {
-      shaderSource += currentChild.textContent;
-    }
-    currentChild = currentChild.nextSibling;
-  }
-
-  return shaderSource;
-}
-
-/**
- * @param {int} pointN  jumlah banyaknya vertex
- * @param {int} pusatX koordinat X pusat lingkaran
- * @param {int} pusatY koordinat Y pusat lingkaran
- * @param {int} radius radius lingkaran
- * @param {array} color color value in array [R, G, B, 1.0]
- *
- *
- * @typedef {Object} result
- * @property {array} vertexData array vertexData
- * @property {array} colors array colors
- *
- * @returns {result}
- */
-
-function createCircle(pointN, pusatX, pusatY, radius, color) {
-  var vertexData = [pusatX, pusatY];
-
-  for (var i = 0; i <= pointN; i++) {
-    var theta = (i * 2 * Math.PI) / pointN;
-    var x = pusatX + radius * Math.sin(theta);
-    var y = pusatY + radius * Math.cos(theta);
-    vertexData.push(x, y);
-  }
-
-  var colors = [];
-  for (var i = 0; i != vertexData.length; i++) {
-    colors = colors.concat(color);
-  }
-
-  return {
-    vertexData: vertexData,
-    colors: colors,
-  };
-}
-
-/**
  * bind data to buffer and pass it to the shader
  *
  * @param {WebGLRenderingContext} gl
- * @param {BufferSource} bufferData
+ * @param {BufferSource} attrData
  * @param {number} itemSize
  * @param {number} attrLocation
  */
-function draw(gl, bufferData, itemSize, attrLocation) {
+function drawAttr(gl, attrData, itemSize, attrLocation) {
   const tempBuffer = gl.createBuffer();
 
   gl.bindBuffer(gl.ARRAY_BUFFER, tempBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, bufferData, gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, attrData, gl.STATIC_DRAW);
 
   gl.vertexAttribPointer(attrLocation, itemSize, gl.FLOAT, false, 0, 0);
+}
+
+/**
+ * @param {WebGLRenderingContext} gl
+ * @param {WebGLUniformLocation} attrLocation
+ * @param {Iterable} uniformData
+ */
+function drawUniform(gl, attrLocation, uniformData) {
+  gl.uniformMatrix4fv(attrLocation, false, uniformData);
+}
+
+function render(gl, )
+
+/**
+ *
+ * @param {WebGLRenderingContext} gl GL Rendering COntext
+ * @param {number} deltaTime Elapsed Time
+ * @param {Object} uniformLocation object cotanining WebGLUniformLocation
+ * @param {number} vertexLength length of vertexData...
+ * @param {HTMLCanvasElement} canvas HTML Canvas Element
+ * @param {number} rotate the angle of rotation
+ * @param {Array} translate translation value
+ */
+function animate(
+  gl,
+  canvas,
+  deltaTime,
+  uniformLocation,
+  vertexLength,
+  rotate,
+  translate
+) {
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  //projection View Matrix
+  const fieldOfView = (45 * Math.PI) / 180; //45 degree angle
+  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+
+  const projectionMatrix = mat4.create();
+  mat4.perspective(projectionMatrix, fieldOfView, aspect, 0.1, 100.0);
+
+  //ModelView Matrix
+  const modelViewMatrix = mat4.create();
+
+  mat4.rotate(modelViewMatrix, modelViewMatrix, rotate, [0, 0, 1]);
+  mat4.translate(
+    modelViewMatrix, // destination matrix
+    modelViewMatrix, // matrix to translate
+    translate
+  );
+
+  drawUniform(gl, uniformLocation.projection, projectionMatrix);
+  drawUniform(gl, uniformLocation.modelView, modelViewMatrix);
 }
 
 function startup() {
@@ -136,8 +99,8 @@ function startup() {
   gl.enableVertexAttribArray(programInfo.attr.vertexPostition);
   gl.enableVertexAttribArray(programInfo.attr.color);
 
-  circle = createCircle(100, 0, 0, 0.3, [0, 0, 0, 1.0]);
-  circle2 = createCircle(100, 0.3, 0, 0.1, [0, 0, 1, 1.0]);
+  circle = createCircle(100, 0, 0, 0.5, [0, 0, 0, 1.0]);
+  circle2 = createCircle(100, 0, 0, 0.3, [0, 0, 1, 1.0]);
 
   gl.clearColor(102 / 255, 153 / 255, 1.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -145,21 +108,21 @@ function startup() {
 
   gl.useProgram(shaderProgram);
 
-  draw(
+  drawAttr(
     gl,
     new Float32Array(circle.vertexData),
     2,
     programInfo.attr.vertexPostition
   );
-  draw(gl, new Float32Array(circle.colors), 4, programInfo.attr.color);
+  drawAttr(gl, new Float32Array(circle.colors), 4, programInfo.attr.color);
   gl.drawArrays(gl.TRIANGLE_FAN, 0, circle.vertexData.length / 2);
 
-  draw(
+  drawAttr(
     gl,
     new Float32Array(circle2.vertexData),
     2,
     programInfo.attr.vertexPostition
   );
-  draw(gl, new Float32Array(circle2.colors), 4, programInfo.attr.color);
+  drawAttr(gl, new Float32Array(circle2.colors), 4, programInfo.attr.color);
   gl.drawArrays(gl.TRIANGLE_FAN, 0, circle2.vertexData.length / 2);
 }

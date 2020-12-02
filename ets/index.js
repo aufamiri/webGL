@@ -1,3 +1,77 @@
+var data = [
+  {
+    rad: 0.8,
+    color: [1, 0.97, 0.19, 1.0],
+    translation: [0, 0, -20],
+    rotation: 0.0,
+    hasChild: true,
+    parentId: -1,
+  },
+
+  {
+    rad: 0.1,
+    color: [0.57, 0.27, 0.18, 1.0],
+    translation: [-1.3, 0, 0],
+    rotation: 0.3,
+    hasChild: false,
+    parentId: 0,
+  },
+
+  {
+    rad: 0.15,
+    color: [0.57, 0.09, 0.09, 1.0],
+    translation: [-2, 0, 0],
+    rotation: 0.1,
+    hasChild: false,
+    parentId: 0,
+  },
+
+  {
+    rad: 0.4,
+    color: [0.15, 0.22, 0.8, 1.0],
+    translation: [-3, 0, 0],
+    rotation: 0.03,
+    hasChild: true,
+    parentId: 0,
+  },
+
+  {
+    rad: 0.25,
+    color: [0.8, 0.8, 0.8, 1.0],
+    translation: [-0.7, 0, 0],
+    rotation: 0.08,
+    hasChild: false,
+    parentId: 1,
+  },
+
+  {
+    rad: 0.3,
+    color: [1.0, 0.15, 0.05, 1.0],
+    translation: [-4.3, 0, 0],
+    rotation: 0.028,
+    hasChild: false,
+    parentId: 0,
+  },
+
+  {
+    rad: 0.6,
+    color: [0.58, 0.38, 0.25, 1.0],
+    translation: [-6, 0, 0],
+    rotation: 0.02,
+    hasChild: false,
+    parentId: 0,
+  },
+
+  {
+    rad: 0.6,
+    color: [0.58, 0.38, 0.25, 1.0],
+    translation: [-6, 0, 0],
+    rotation: 0.02,
+    hasChild: false,
+    parentId: 0,
+  },
+];
+
 /**
  * @typedef {Object} objectArray
  * @property {circle} object contain the object VertexData and Colors
@@ -169,41 +243,18 @@ function startup() {
   gl.enableVertexAttribArray(programInfo.attr.vertexPostition);
   gl.enableVertexAttribArray(programInfo.attr.color);
 
-  objectArray.push({
-    object: createCircle(6, 0, 0, 0.5, [0, 0, 0, 1.0]),
-    translation: [0, 0, -20],
-    deltaRotation: 0.01,
-    currentRotation: 0,
-    hasChild: true,
-    parentId: -1,
-  });
+  const defaultN = 100;
 
-  objectArray.push({
-    object: createCircle(6, 0, 0, 0.3, [0, 0, 1, 1.0]),
-    translation: [-2, 0, 0],
-    deltaRotation: 0.02,
-    currentRotation: 0,
-    hasChild: true,
-    parentId: 0,
-  });
-
-  objectArray.push({
-    object: createCircle(6, 0, 0, 0.2, [0, 1, 1, 1.0]),
-    translation: [-0.3, 0, 0],
-    deltaRotation: 0.05,
-    currentRotation: 0,
-    hasChild: false,
-    parentId: 1,
-  });
-
-  objectArray.push({
-    object: createCircle(6, 0, 0, 0.5, [0, 1, 1, 1.0]),
-    translation: [-3, -1, 0],
-    deltaRotation: 0.05,
-    currentRotation: 0,
-    hasChild: true,
-    parentId: 0,
-  });
+  for (obj in data) {
+    objectArray.push({
+      object: createCircle(defaultN, 0, 0, data[obj].rad, data[obj].color),
+      translation: data[obj].translation,
+      deltaRotation: data[obj].rotation,
+      currentRotation: 0,
+      hasChild: data[obj].hasChild,
+      parentId: data[obj].parentId,
+    });
+  }
 
   gl.clearColor(102 / 255, 153 / 255, 1.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);

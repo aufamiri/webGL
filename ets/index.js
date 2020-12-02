@@ -89,7 +89,7 @@ var anim = {
         objectArray[i].currentRotation + objectArray[i].deltaRotation;
     }
 
-    // window.requestAnimationFrame(this.render);
+    window.requestAnimationFrame(this.render);
   },
 };
 
@@ -176,20 +176,20 @@ function startup() {
   gl.enableVertexAttribArray(programInfo.attr.vertexPostition);
   gl.enableVertexAttribArray(programInfo.attr.color);
 
-  var zIndex = -5;
+  var zIndex = -6;
 
   objectArray.push({
-    object: createCircle(6, 0, 0, 0.2, [0, 0, 0, 1.0]),
-    translation: [0, 0, zIndex],
-    deltaRotation: 0.0,
+    object: createCircle(6, 0, 0, 0.5, [0, 0, 0, 1.0]),
+    translation: [0, 0, -20],
+    deltaRotation: 0.01,
     currentRotation: 0,
     hasChild: true,
     parentId: -1,
   });
 
   objectArray.push({
-    object: createCircle(6, 0, 0, 0.1, [0, 0, 1, 1.0]),
-    translation: [-2, 0, zIndex],
+    object: createCircle(6, 0, 0, 0.3, [0, 0, 1, 1.0]),
+    translation: [-2, 0, 0],
     deltaRotation: 0.02,
     currentRotation: 0,
     hasChild: true,
@@ -197,8 +197,8 @@ function startup() {
   });
 
   objectArray.push({
-    object: createCircle(6, 0, 0, 0.1, [0, 1, 1, 1.0]),
-    translation: [0, 0, zIndex],
+    object: createCircle(6, 0, 0, 0.2, [0, 1, 1, 1.0]),
+    translation: [-1, 0, 0],
     deltaRotation: 0.05,
     currentRotation: 0,
     hasChild: false,

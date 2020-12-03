@@ -29,6 +29,25 @@ function drawAttr(gl, attrData, itemSize, attrLocation) {
 }
 
 /**
+ * bind data to buffer and pass it to the shader
+ *
+ * @param {WebGLRenderingContext} gl
+ * @param {BufferSource} attrData
+ * @param {number} itemSize
+ * @param {number} attrLocation
+ */
+function drawIndices(gl, indexData) {
+  const tempBuffer = gl.createBuffer();
+
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tempBuffer);
+  gl.bufferData(
+    gl.ELEMENT_ARRAY_BUFFER,
+    new Uint16Array(indexData),
+    gl.STATIC_DRAW
+  );
+}
+
+/**
  * @param {WebGLRenderingContext} gl
  * @param {WebGLUniformLocation} attrLocation
  * @param {Iterable} uniformData

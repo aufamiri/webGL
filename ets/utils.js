@@ -87,3 +87,59 @@ function createCircle(pointN, pusatX, pusatY, radius, color) {
     colors: colors,
   };
 }
+
+/**
+ * @param {number} div radius lingkaran
+ * @param {number[]} color color value in array [R, G, B, 1.0]
+ *
+ *
+ * @typedef {Object} sphere
+ * @property {number[]} vertexData array vertexData
+ * @property {number[]} colors array colors
+ * @property {number[]} indices array indices
+ *
+ * @returns {sphere}
+ */
+
+function createSphere(gl, div, color) {
+  var positions = [];
+  for (var i = 0; i <= div; ++i) {
+    var ai = (i * Math.PI) / div;
+    var si = Math.sin(ai);
+    var ci = Math.cos(ai);
+    for (var j = 0; j <= div; ++j) {
+      var aj = (j * 2 * Math.PI) / div;
+      var sj = Math.sin(aj);
+      var cj = Math.cos(aj);
+      positions = positions.concat([si * sj, ci, si * cj]);
+    }
+  }
+
+  var indices = [];
+  for (var i = 0; i < div; ++i) {
+    for (var j = 0; j < div; ++j) {
+      var p1 = i * (div + 1) + j;
+      var p2 = p1 + (div + 1);
+      indices = indices.concat([p1, p2, p1 + 1, p1 + 1, p2, p2 + 1]);
+    }
+  }
+
+  const indexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(
+    gl.ELEMENT_ARRAY_BUFFER,
+    new Uint16Array(indices),
+    gl.STATIC_DRAW
+  );
+
+  var colors = [];
+  for (var i = 0; i != vertexData.length; i++) {
+    colors = colors.concat(color);
+  }
+
+  return {
+    vertexData: positions,
+    indices: indices,
+    colors: colors,
+  };
+}

@@ -53,6 +53,8 @@ function getShaderfromDOM(id) {
 }
 
 /**
+ * fungsi untuk membuat lingkaran dengan enak, gampang dan langsung
+ *
  * @param {number} pointN  jumlah banyaknya vertex
  * @param {number} pusatX koordinat X pusat lingkaran
  * @param {number} pusatY koordinat Y pusat lingkaran
@@ -60,7 +62,7 @@ function getShaderfromDOM(id) {
  * @param {number[]} color color value in array [R, G, B, 1.0]
  *
  *
- * @typedef {Object} circle
+ * @typedef {Object} circle value circle
  * @property {number[]} vertexData array vertexData
  * @property {number[]} colors array colors
  *

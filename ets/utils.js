@@ -127,7 +127,7 @@ function createSphere(gl, div, color) {
   }
 
   var colors = [];
-  for (var i = 0; i != positions.length; i++) {
+  for (var i = 0; i != indices.length; i++) {
     colors = colors.concat(color);
   }
 

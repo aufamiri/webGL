@@ -149,7 +149,7 @@ var anim = {
       drawAttr(
         anim.gl,
         new Float32Array(objectArray[i].object.vertexData),
-        2,
+        3,
         anim.programInfo.attr.vertexPostition
       );
 
@@ -166,7 +166,7 @@ var anim = {
         anim.gl,
         anim.canvas,
         anim.programInfo.uniform,
-        objectArray[i].object.vertexData.length,
+        objectArray[i].object.indices.length,
         objectArray[i].currentRotation,
         objectArray[i].translation,
         anim.prevModelView[objectArray[i].parentId],
@@ -215,7 +215,6 @@ function animate(
   //projection View Matrix
   const fieldOfView = (45 * Math.PI) / 180; //45 degree angle
   const aspect = canvas.clientWidth / canvas.clientHeight;
-  z;
   const projectionMatrix = mat4.create();
   mat4.perspective(projectionMatrix, fieldOfView, aspect, 0.1, 100.0);
 

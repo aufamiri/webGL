@@ -74,7 +74,7 @@ var data = [
 
 /**
  * @typedef {Object} objectArray
- * @property {circle} object contain the object VertexData and Colors
+ * @property {sphere} object contain the object VertexData and Colors
  * @property {number[]} translation translation of the object in [X, Y, Z]
  * @property {number} deltaRotation the speed of the rotation
  * @property {number} currentRotation current angle of the rotation
@@ -109,6 +109,8 @@ function drawAttr(gl, attrData, itemSize, attrLocation) {
  * @param {BufferSource} attrData
  * @param {number} itemSize
  * @param {number} attrLocation
+ *
+ * @returns {WebGLBuffer} //indices buffer
  */
 function drawIndices(gl, indexData) {
   const tempBuffer = gl.createBuffer();
@@ -119,6 +121,8 @@ function drawIndices(gl, indexData) {
     new Uint16Array(indexData),
     gl.STATIC_DRAW
   );
+
+  return tempBuffer;
 }
 
 /**
@@ -156,6 +160,8 @@ var anim = {
         anim.programInfo.attr.color
       );
 
+      var indicesBuffer = drawIndices(anim.gl, objectArray[i].object.indices);
+
       tempTranslate = animate(
         anim.gl,
         anim.canvas,
@@ -163,7 +169,8 @@ var anim = {
         objectArray[i].object.vertexData.length,
         objectArray[i].currentRotation,
         objectArray[i].translation,
-        anim.prevModelView[objectArray[i].parentId]
+        anim.prevModelView[objectArray[i].parentId],
+        indicesBuffer
       );
 
       if (objectArray[i].hasChild) {
@@ -178,7 +185,7 @@ var anim = {
         objectArray[i].currentRotation + objectArray[i].deltaRotation;
     }
 
-    window.requestAnimationFrame(this.render);
+    // window.requestAnimationFrame(this.render);
   },
 };
 
@@ -191,6 +198,7 @@ var anim = {
  * @param {number} rotate the angle of rotation
  * @param {number[]} translate translation value
  * @param {Iterable} prevTranslate previous iteration modelView
+ * @param {WebGLBuffer} indicesBuffer
  *
  * @returns {Iterable}
  */
@@ -201,12 +209,13 @@ function animate(
   vertexLength,
   rotate,
   translate,
-  prevTranslate
+  prevTranslate,
+  indicesBuffer
 ) {
   //projection View Matrix
   const fieldOfView = (45 * Math.PI) / 180; //45 degree angle
   const aspect = canvas.clientWidth / canvas.clientHeight;
-
+  z;
   const projectionMatrix = mat4.create();
   mat4.perspective(projectionMatrix, fieldOfView, aspect, 0.1, 100.0);
 
@@ -227,7 +236,8 @@ function animate(
   drawUniform(gl, uniformLocation.projection, projectionMatrix);
   drawUniform(gl, uniformLocation.modelView, modelViewMatrix);
 
-  gl.drawArrays(gl.TRIANGLE_FAN, 0, vertexLength / 2);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
+  gl.drawElements(gl.TRIANGLES, vertexLength, gl.UNSIGNED_SHORT, 0);
 
   return modelViewMatrix;
 }
@@ -264,16 +274,27 @@ function startup() {
 
   const defaultN = 100;
 
-  for (obj in data) {
-    objectArray.push({
-      object: createCircle(defaultN, 0, 0, data[obj].rad, data[obj].color),
-      translation: data[obj].translation,
-      deltaRotation: data[obj].rotation,
-      currentRotation: 0,
-      hasChild: data[obj].hasChild,
-      parentId: data[obj].parentId,
-    });
-  }
+  objectArray.push({
+    object: createSphere(gl, 6, data[1].color),
+    translation: data[1].translation,
+    deltaRotation: data[1].rotation,
+    currentRotation: 0,
+    hasChild: data[1].hasChild,
+    parentId: data[1].parentId,
+  });
+
+  console.log(objectArray);
+
+  // for (obj in data) {
+  //   objectArray.push({
+  //     object: createCircle(defaultN, 0, 0, data[obj].rad, data[obj].color),
+  //     translation: data[obj].translation,
+  //     deltaRotation: data[obj].rotation,
+  //     currentRotation: 0,
+  //     hasChild: data[obj].hasChild,
+  //     parentId: data[obj].parentId,
+  //   });
+  // }
 
   gl.clearColor(102 / 255, 153 / 255, 1.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);

@@ -126,16 +126,8 @@ function createSphere(gl, div, color) {
     }
   }
 
-  const indexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-  gl.bufferData(
-    gl.ELEMENT_ARRAY_BUFFER,
-    new Uint16Array(indices),
-    gl.STATIC_DRAW
-  );
-
   var colors = [];
-  for (var i = 0; i != vertexData.length; i++) {
+  for (var i = 0; i != positions.length; i++) {
     colors = colors.concat(color);
   }
 

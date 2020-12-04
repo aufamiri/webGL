@@ -97,13 +97,13 @@ function createCircle(pointN, pusatX, pusatY, radius, color) {
  *
  * @typedef {Object} sphere
  * @property {number[]} vertexData array vertexData
- * @property {number[]} colors array colors
  * @property {number[]} indices array indices
+ * @property {number[]} colors array colors
  *
  * @returns {sphere}
  */
 
-function createSphere(div, color) {
+function createSphere(gl, div, color) {
   var positions = [];
   for (var i = 0; i <= div; ++i) {
     var ai = (i * Math.PI) / div;

@@ -44,32 +44,14 @@ var data = [
     parentId: 1,
   },
 
-  // {
-  //   rad: 0.3,
-  //   color: [1.0, 0.15, 0.05, 1.0],
-  //   translation: [-4.3, 0, 0],
-  //   rotation: 0.028,
-  //   hasChild: false,
-  //   parentId: 0,
-  // },
-
-  // {
-  //   rad: 0.6,
-  //   color: [0.58, 0.38, 0.25, 1.0],
-  //   translation: [-6, 0, 0],
-  //   rotation: 0.02,
-  //   hasChild: false,
-  //   parentId: 0,
-  // },
-
-  // {
-  //   rad: 0.6,
-  //   color: [0.58, 0.38, 0.25, 1.0],
-  //   translation: [-6, 0, 0],
-  //   rotation: 0.02,
-  //   hasChild: false,
-  //   parentId: 0,
-  // },
+  {
+    scale: 0.3,
+    color: [1.0, 0.15, 0.05, 1.0],
+    translation: [-18, 0, 0],
+    rotation: 0.028,
+    hasChild: false,
+    parentId: 0,
+  },
 ];
 
 /**
@@ -135,9 +117,18 @@ function drawUniform(gl, attrLocation, uniformData) {
   gl.uniformMatrix4fv(attrLocation, false, uniformData);
 }
 
+/**
+ * @typedef {Object} anim
+ * @property {number[]} prevModelView previous modelview for hierarchy
+ * @property {number[]} camLocation location coord of camera
+ * @property {number[]} povLoc camera lookAt coord
+ * @property {WebGLRenderingContext} gl
+ * @property {HTMLCanvasElement} canvas
+ *
+ * @type {anim}
+ */
 var anim = {
   prevModelView: [],
-  prevParentId: -2,
   camLocation: [0, -10, 0],
   povLoc: [0, 0, 0],
 
@@ -199,7 +190,7 @@ var anim = {
  * @param {number} rotate the angle of rotation
  * @param {number} scale the scale of the planet
  * @param {number[]} translate translation value
- * @param {Iterable} prevTranslate previous iteration modelView
+ * @param {Iterable} prevModelView previous iteration modelView
  * @param {number[]} camLocation vec3 of cameraLocation
  * @param {number[]} POVLoc vec3 of POV
  *
@@ -213,7 +204,7 @@ function animate(
   rotate,
   scale,
   translate,
-  prevTranslate,
+  prevModelView,
   camLocation,
   POVLoc
 ) {
@@ -225,10 +216,11 @@ function animate(
 
   //ModelView Matrix
   var modelViewMatrix = mat4.create();
-  mat4.lookAt(modelViewMatrix, camLocation, POVLoc, [0, 0, 1]);
 
-  if (prevTranslate != undefined) {
-    modelViewMatrix = mat4.clone(prevTranslate);
+  if (prevModelView != undefined) {
+    modelViewMatrix = mat4.clone(prevModelView);
+  } else {
+    mat4.lookAt(modelViewMatrix, camLocation, POVLoc, [0, 0, 1]);
   }
 
   mat4.scale(modelViewMatrix, modelViewMatrix, [scale, scale, scale]);

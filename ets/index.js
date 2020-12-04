@@ -2,7 +2,7 @@ var data = [
   {
     color: [1, 0.97, 0.19, 1.0],
     translation: [0, 0, 0],
-    rotation: 0.0,
+    rotation: 0.01,
     scale: 1,
     hasChild: true,
     parentId: -1,
@@ -213,11 +213,14 @@ function animate(
   const fieldOfView = (45 * Math.PI) / 180; //45 degree angle
   const aspect = canvas.clientWidth / canvas.clientHeight;
   const projectionMatrix = mat4.create();
-  mat4.perspective(projectionMatrix, fieldOfView, aspect, 0.1, 100000000000.0);
-  mat4.lookAt(projectionMatrix, [0, 0, -20], [0, 0, 0], [0, 1, 0]);
+  mat4.perspective(projectionMatrix, fieldOfView, aspect, 0.1, 100.0);
+  // mat4.lookAt(projectionMatrix, [0, 0, 0], [0, 0, 0], [0, 1, 0]);
+  // mat4.translate(projectionMatrix, projectionMatrix, [0, 0, -10]);
+  // mat4.rotate(projectionMatrix, projectionMatrix, 5, [1, 0, 0]);
 
   //ModelView Matrix
   var modelViewMatrix = mat4.create();
+  mat4.lookAt(modelViewMatrix, [0, -20, 5], [0, 0, 0], [0, 0, 1]);
 
   if (prevTranslate != undefined) {
     modelViewMatrix = mat4.clone(prevTranslate);
@@ -284,6 +287,7 @@ function startup() {
   }
 
   gl.clearColor(102 / 255, 153 / 255, 1.0, 1.0);
+  gl.enable(gl.DEPTH_TEST);
   gl.clear(gl.COLOR_BUFFER_BIT);
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 

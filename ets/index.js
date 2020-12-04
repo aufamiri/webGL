@@ -138,6 +138,8 @@ function drawUniform(gl, attrLocation, uniformData) {
 var anim = {
   prevModelView: [],
   prevParentId: -2,
+  camLocation: [0, -10, 0],
+  povLoc: [0, 0, 0],
 
   render: function () {
     anim.gl.viewport(0, 0, anim.canvas.width, anim.canvas.height);
@@ -171,7 +173,9 @@ var anim = {
         objectArray[i].currentRotation,
         objectArray[i].scale,
         objectArray[i].translation,
-        anim.prevModelView[objectArray[i].parentId]
+        anim.prevModelView[objectArray[i].parentId],
+        anim.camLocation,
+        anim.povLoc
       );
 
       if (objectArray[i].hasChild) {
@@ -196,6 +200,8 @@ var anim = {
  * @param {number} scale the scale of the planet
  * @param {number[]} translate translation value
  * @param {Iterable} prevTranslate previous iteration modelView
+ * @param {number[]} camLocation vec3 of cameraLocation
+ * @param {number[]} POVLoc vec3 of POV
  *
  * @returns {Iterable}
  */
@@ -207,7 +213,9 @@ function animate(
   rotate,
   scale,
   translate,
-  prevTranslate
+  prevTranslate,
+  camLocation,
+  POVLoc
 ) {
   //projection View Matrix
   const fieldOfView = (45 * Math.PI) / 180; //45 degree angle
@@ -217,7 +225,7 @@ function animate(
 
   //ModelView Matrix
   var modelViewMatrix = mat4.create();
-  mat4.lookAt(modelViewMatrix, [0, -20, 5], [0, 0, 0], [0, 0, 1]);
+  mat4.lookAt(modelViewMatrix, camLocation, POVLoc, [0, 0, 1]);
 
   if (prevTranslate != undefined) {
     modelViewMatrix = mat4.clone(prevTranslate);
@@ -239,12 +247,39 @@ function animate(
   return modelViewMatrix;
 }
 
+function onKeyUp(event) {
+  const defaultJump = 5;
+
+  if (event.keyCode == 38 && anim.camLocation[2] <= 20) {
+    anim.camLocation[2] += defaultJump;
+  }
+  if (event.keyCode == 40 && anim.camLocation[2] >= 0) {
+    anim.camLocation[2] -= defaultJump;
+  }
+
+  if (event.keyCode == 87 && anim.camLocation[1] <= 20) {
+    anim.camLocation[1] += defaultJump;
+  }
+  if (event.keyCode == 83 && anim.camLocation[1] >= -30) {
+    anim.camLocation[1] -= defaultJump;
+  }
+
+  if (event.keyCode == 68) {
+    anim.povLoc[0] += defaultJump / 2;
+  }
+  if (event.keyCode == 65) {
+    anim.povLoc[0] -= defaultJump / 2;
+  }
+}
+
 function startup() {
   /** @type {HTMLCanvasElement} */
   const canvas = document.getElementById("canvas");
 
   /** @type {WebGLRenderingContext} */
   const gl = createGLContext(canvas);
+
+  document.addEventListener("keydown", onKeyUp, true);
 
   const vertexShaderSource = getShaderfromDOM("vs-src");
   const fragmentShaderSource = getShaderfromDOM("fs-src");

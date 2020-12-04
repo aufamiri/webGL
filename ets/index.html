@@ -5,7 +5,19 @@
     <meta charset="utf-8" />
   </head>
   <body onload="startup();">
-    <canvas id="canvas" width="500" height="500" />
+    <canvas id="canvas" width="500" height="500"></canvas>
+
+    <div style="position: absolute; top: 550px; color: black; z-index: 10">
+      Keyboard:
+      <ul>
+        <li>W untuk maju</li>
+        <li>S untuk mundul</li>
+        <li>D untuk rotate ke kanan</li>
+        <li>A untuk rotate ke kiri</li>
+        <li>panah atas untuk ke atas (max. 20)</li>
+        <li>panah bawah untuk ke bawah (min.0)</li>
+      </ul>
+    </div>
 
     <script id="vs-src" type="x-shader/x-vertex">
       attribute vec3 aVertexPosition;

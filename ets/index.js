@@ -214,9 +214,6 @@ function animate(
   const aspect = canvas.clientWidth / canvas.clientHeight;
   const projectionMatrix = mat4.create();
   mat4.perspective(projectionMatrix, fieldOfView, aspect, 0.1, 100.0);
-  // mat4.lookAt(projectionMatrix, [0, 0, 0], [0, 0, 0], [0, 1, 0]);
-  // mat4.translate(projectionMatrix, projectionMatrix, [0, 0, -10]);
-  // mat4.rotate(projectionMatrix, projectionMatrix, 5, [1, 0, 0]);
 
   //ModelView Matrix
   var modelViewMatrix = mat4.create();

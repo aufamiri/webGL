@@ -1,6 +1,6 @@
 /**
  * @typedef {Object} objectArray
- * @property {cube} object contain the object VertexData and Colors
+ * @property {pyramid} object contain the object VertexData and Colors
  * @property {number} deltaRotation the speed of the rotation
  * @property {number} currentRotation current angle of the rotation
  */
@@ -246,7 +246,7 @@ function startup() {
   gl.useProgram(shaderProgram);
 
   objectArray = {
-    object: createCube(),
+    object: createPyramid(),
     currentRotation: 0,
     deltaRotation: 0.01,
   };

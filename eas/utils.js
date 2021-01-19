@@ -53,16 +53,15 @@ function getShaderfromDOM(id) {
 }
 
 /**
- * @typedef {Object} cube
+ * @typedef {Object} pyramid
  * @property {number[]} vertexData array vertexData
- * @property {number[]} colors array colors
  * @property {number[]} indices array indices
  * @property {number[]} normal array normal vector
  *
- * @returns {cube}
+ * @returns {pyramid}
  */
 
-function createCube() {
+function createPyramid() {
   //prettier-ignore
   const positions = [
 
@@ -74,23 +73,6 @@ function createCube() {
 
    0.0,  1.5,  0.0
   ]
-
-  const color = [
-    [1.0, 1.0, 1.0, 1.0], // Front face: white
-    [1.0, 0.0, 0.0, 1.0], // Back face: red
-    [0.0, 1.0, 0.0, 1.0], // Top face: green
-    [0.0, 0.0, 1.0, 1.0], // Bottom face: blue
-    [1.0, 1.0, 0.0, 1.0], // Right face: yellow
-  ];
-
-  var colors = [];
-
-  for (var j = 0; j < color.length; ++j) {
-    const c = color[j];
-
-    // Repeat each color four times for the four vertices of the face
-    colors = colors.concat(c, c, c, c);
-  }
 
   //prettier-ignore
   const indices = [
@@ -126,7 +108,6 @@ function createCube() {
   return {
     vertexData: positions,
     indices: indices,
-    colors: colors,
     normal: normal,
   };
 }

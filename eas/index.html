@@ -9,26 +9,49 @@
 
     <script id="vs-src" type="x-shader/x-vertex">
       attribute vec3 aVertexPosition;
-      attribute vec4 aVertexColor;
+      attribute vec3 aVertexNormal;
 
       uniform mat4 uModelViewMatrix;
       uniform mat4 uProjectionMatrix;
+      uniform mat4 uNormalViewMatrix;
+      uniform vec4 uLightPosition;
 
-      varying vec4 vColor;
+      varying vec3 L, N, E;
 
       void main(void) {
-          gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);
-          vColor = aVertexColor;
+        vec3 pos = (uModelViewMatrix * vec4(aVertexPosition, 1.0)).xyz;
+        vec3 lightPos = (uNormalViewMatrix * uLightPosition).xyz;
+
+        L = normalize(lightPos - pos);
+        N = normalize((uModelViewMatrix * vec4(aVertexNormal,1.0)).xyz);
+        E = -normalize(pos);
+
+        gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);
       }
     </script>
 
     <script id="fs-src" type="x-shader/x-fragment">
       precision mediump float;
+      varying vec3 L, N, E;
 
-      varying vec4 vColor;
+      uniform vec4 ambientProduct;
+      uniform vec4 diffuseProduct;
+      uniform vec4 specularProduct;
+      uniform float shininess;
 
-      void main(void) {
-          gl_FragColor = vColor;
+      void main()
+      {
+        vec4 diffuse = max(dot(L, N), 0.0) * diffuseProduct;
+        vec3 H = normalize(L+E);
+        vec4 specular = pow(max(dot(N, H), 0.0), shininess) * specularProduct;
+
+        if (dot(L, N) < 0.0)
+          specular = vec4(0.0, 0.0, 0.0, 1.0);
+
+        vec4 fColor = ambientProduct + diffuse + specular;
+        fColor.a = 1.0;
+
+        gl_FragColor = fColor;
       }
     </script>
 

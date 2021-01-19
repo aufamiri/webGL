@@ -53,44 +53,6 @@ function getShaderfromDOM(id) {
 }
 
 /**
- * fungsi untuk membuat lingkaran dengan enak, gampang dan langsung
- *
- * @param {number} pointN  jumlah banyaknya vertex
- * @param {number} pusatX koordinat X pusat lingkaran
- * @param {number} pusatY koordinat Y pusat lingkaran
- * @param {number} radius radius lingkaran
- * @param {number[]} color color value in array [R, G, B, 1.0]
- *
- *
- * @typedef {Object} circle value circle
- * @property {number[]} vertexData array vertexData
- * @property {number[]} colors array colors
- *
- * @returns {circle}
- */
-
-function createCircle(pointN, pusatX, pusatY, radius, color) {
-  var vertexData = [pusatX, pusatY];
-
-  for (var i = 0; i <= pointN; i++) {
-    var theta = (i * 2 * Math.PI) / pointN;
-    var x = pusatX + radius * Math.sin(theta);
-    var y = pusatY + radius * Math.cos(theta);
-    vertexData.push(x, y);
-  }
-
-  var colors = [];
-  for (var i = 0; i != vertexData.length; i++) {
-    colors = colors.concat(color);
-  }
-
-  return {
-    vertexData: vertexData,
-    colors: colors,
-  };
-}
-
-/**
  * @param {number} div radius lingkaran
  * @param {number[]} color color value in array [R, G, B, 1.0]
  *
@@ -135,5 +97,84 @@ function createSphere(div, color) {
     vertexData: positions,
     indices: indices,
     colors: colors,
+  };
+}
+
+/**
+ * @typedef {Object} cube
+ * @property {number[]} vertexData array vertexData
+ * @property {number[]} colors array colors
+ * @property {number[]} indices array indices
+ * @property {number[]} normal array normal vector
+ *
+ * @returns {cube}
+ */
+
+function createCube() {
+  //prettier-ignore
+  const positions = [
+
+  // Bottom face
+  -1.0, -1.0, -1.0,
+   1.0, -1.0, -1.0,
+   1.0, -1.0,  1.0,
+  -1.0, -1.0,  1.0,
+
+   0.0,  0.0,  0.0
+  ]
+
+  const color = [
+    [1.0, 1.0, 1.0, 1.0], // Front face: white
+    [1.0, 0.0, 0.0, 1.0], // Back face: red
+    [0.0, 1.0, 0.0, 1.0], // Top face: green
+    [0.0, 0.0, 1.0, 1.0], // Bottom face: blue
+    [1.0, 1.0, 0.0, 1.0], // Right face: yellow
+  ];
+
+  var colors = [];
+
+  for (var j = 0; j < color.length; ++j) {
+    const c = color[j];
+
+    // Repeat each color four times for the four vertices of the face
+    colors = colors.concat(c, c, c, c);
+  }
+
+  //prettier-ignore
+  const indices = [
+    0,  1,  2,      0,  2,  3,    // front
+    0,  1,  4,      2,  3,  4,    // back
+    0,  3,  4,      1,  2,  4,   // top
+  ];
+
+  var normal = [];
+
+  for (i = 0; i <= indices.length - 3; i += 3) {
+    a = indices[i] * 3;
+    b = indices[i + 1] * 3;
+    c = indices[i + 2] * 3;
+
+    p1 = vec3.fromValues(positions[a], positions[a + 1], positions[a + 2]);
+    p2 = vec3.fromValues(positions[b], positions[b + 1], positions[b + 2]);
+    p3 = vec3.fromValues(positions[c], positions[c + 1], positions[c + 2]);
+
+    t1 = vec3.create();
+    t2 = vec3.create();
+    result = vec3.create();
+
+    vec3.subtract(t1, p2, p1);
+    vec3.subtract(t2, p3, p1);
+
+    vec3.cross(result, t1, t2);
+    vec3.normalize(result, result);
+
+    normal = normal.concat([result[0], result[1], result[2]]);
+  }
+
+  return {
+    vertexData: positions,
+    indices: indices,
+    colors: colors,
+    normal: normal,
   };
 }

@@ -18,6 +18,8 @@ var materialDiffuse = [1.0, 0.38, 0.31, 1.0];
 var materialSpecular = [0.4, 0.4, 0.4, 1.0];
 var materialShininess = 300.0;
 
+var isFlip = false;
+
 /**
  * bind data to buffer and pass it to the shader
  *
@@ -172,6 +174,16 @@ function animate(
 
   var specularProduct = vec4.create();
   vec4.multiply(specularProduct, lightSpecular, materialSpecular);
+
+  if (isFlip === true) {
+    lightPosition[0] += 0.05;
+  } else {
+    lightPosition[0] -= 0.05;
+  }
+
+  if (lightPosition[0] * lightPosition[0] > 4) {
+    isFlip = !isFlip;
+  }
 
   drawMatUniform(gl, uniformLocation.projection, projectionMatrix);
   drawMatUniform(gl, uniformLocation.modelView, modelViewMatrix);

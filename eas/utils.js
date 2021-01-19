@@ -53,54 +53,6 @@ function getShaderfromDOM(id) {
 }
 
 /**
- * @param {number} div radius lingkaran
- * @param {number[]} color color value in array [R, G, B, 1.0]
- *
- *
- * @typedef {Object} sphere
- * @property {number[]} vertexData array vertexData
- * @property {number[]} colors array colors
- * @property {number[]} indices array indices
- *
- * @returns {sphere}
- */
-
-function createSphere(div, color) {
-  var positions = [];
-  for (var i = 0; i <= div; ++i) {
-    var ai = (i * Math.PI) / div;
-    var si = Math.sin(ai);
-    var ci = Math.cos(ai);
-    for (var j = 0; j <= div; ++j) {
-      var aj = (j * 2 * Math.PI) / div;
-      var sj = Math.sin(aj);
-      var cj = Math.cos(aj);
-      positions = positions.concat([si * sj, ci, si * cj]);
-    }
-  }
-
-  var indices = [];
-  for (var i = 0; i < div; ++i) {
-    for (var j = 0; j < div; ++j) {
-      var p1 = i * (div + 1) + j;
-      var p2 = p1 + (div + 1);
-      indices = indices.concat([p1, p2, p1 + 1, p1 + 1, p2, p2 + 1]);
-    }
-  }
-
-  var colors = [];
-  for (var i = 0; i != indices.length; i++) {
-    colors = colors.concat(color);
-  }
-
-  return {
-    vertexData: positions,
-    indices: indices,
-    colors: colors,
-  };
-}
-
-/**
  * @typedef {Object} cube
  * @property {number[]} vertexData array vertexData
  * @property {number[]} colors array colors
@@ -120,7 +72,7 @@ function createCube() {
    1.0, -1.0,  1.0,
   -1.0, -1.0,  1.0,
 
-   0.0,  0.0,  0.0
+   0.0,  1.5,  0.0
   ]
 
   const color = [
